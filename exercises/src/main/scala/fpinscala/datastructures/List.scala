@@ -1,11 +1,19 @@
 package fpinscala.datastructures
 
+import scala.annotation.tailrec
+
 sealed trait List[+A] // `List` data type, parameterized on a type, `A`
 case object Nil extends List[Nothing] // A `List` data constructor representing the empty list
 /* Another data constructor, representing nonempty lists. Note that `tail` is another `List[A]`,
 which may be `Nil` or another `Cons`.
  */
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
+
+object Test extends App {
+  val l = List(1, 2, 3.0)
+
+  println(List.init(l))
+}
 
 object List { // `List` companion object. Contains functions for creating and working with lists.
   def sum(ints: List[Int]): Int = ints match { // A function that uses pattern matching to add up a list of integers
@@ -23,7 +31,7 @@ object List { // `List` companion object. Contains functions for creating and wo
     if (as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*))
 
-  val x = List(1,2,3,4,5) match {
+  val l: Int = List(1,2,3,4,5) match {
     case Cons(x, Cons(2, Cons(4, _))) => x
     case Nil => 42
     case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
@@ -50,15 +58,30 @@ object List { // `List` companion object. Contains functions for creating and wo
     foldRight(ns, 1.0)(_ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
 
 
-  def tail[A](l: List[A]): List[A] = ???
+  def tail[A](l: List[A]): List[A] = l match {
+    case Nil => Nil
+    case Cons(_, t) => t
+  }
 
-  def setHead[A](l: List[A], h: A): List[A] = ???
+  def setHead[A](l: List[A], h: A): List[A] = Cons(h, l)
 
-  def drop[A](l: List[A], n: Int): List[A] = ???
+  @tailrec def drop[A](l: List[A], n: Int): List[A] = l match {
+    case Nil => Nil
+    case Cons(_, t) if n > 0 => drop(t, n - 1)
+    case Cons(_, t) => t
+  }
 
-  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = ???
+  @tailrec def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
+    case Nil => Nil
+    case Cons(h, t) if f(h) => dropWhile(t, f)
+    case _ => l
+  }
 
-  def init[A](l: List[A]): List[A] = ???
+  def init[A](l: List[A]): List[A] = l match {
+    case Nil => Nil
+    case Cons(_, Nil) => Nil
+    case Cons(h, t) => Cons(h, init(t))
+  }
 
   def length[A](l: List[A]): Int = ???
 

@@ -40,12 +40,11 @@ object MyModule {
   def fib(n: Int): Int = {
 
     @tailrec def _fib(prev: Int, current: Int, seq: Int): Int = {
-      if (seq == 0) current
+      if (seq == 0) prev
       else _fib(current, current + prev, seq-1)
     }
 
-    if (n == 0) 0
-    else _fib(0, 1, n)
+    _fib(0, 1, n)
   }
 
   def main(args: Array[String]): Unit = println(fib(12))
@@ -154,7 +153,7 @@ object PolymorphicFunctions {
   // an `Array[A]` is sorted
   def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = {
 
-    def loop(index: Int): Boolean = {
+    @tailrec def loop(index: Int): Boolean = {
       if (index == as.length - 1) true
       else if (!gt(as(index), as(index+1))) false
       else loop(index + 1)
