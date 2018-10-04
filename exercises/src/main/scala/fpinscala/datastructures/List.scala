@@ -71,9 +71,9 @@ object List { // `List` companion object. Contains functions for creating and wo
     case Cons(_, t) => t
   }
 
-  @tailrec def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
+  @tailrec def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = l match {
     case Nil => Nil
-    case Cons(h, t) if f(h) => dropWhile(t, f)
+    case Cons(h, t) if f(h) => dropWhile(t)(f)
     case _ => l
   }
 
@@ -85,7 +85,25 @@ object List { // `List` companion object. Contains functions for creating and wo
 
   def length[A](l: List[A]): Int = ???
 
-  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = ???
+  @tailrec def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = l match {
+    case Cons(h, t) => foldLeft(t, f(z, h))(f)
+    case Nil => z
+  }
+
+  def reverse[A](l: List[A]): List[A] = foldLeft(l, List[A]())((a, l) => Cons(l, a))
 
   def map[A,B](l: List[A])(f: A => B): List[B] = ???
+
+  def foldRightViaLeft[A,B](as: List[A], z: B)(f: (A, B) => B): B = {
+    def g(b: B, a: A) = f(a, b)
+    foldLeft(reverse(as), z)(g)
+  }
+}
+
+object Run extends App {
+  val l = List(1,2,3,4,5)
+  println(List.init(l))
+  println(List.dropWhile(l)(_ < 3))
+  println(List.foldLeft(l, 15)(_ + _))
+  println(List.reverse(l))
 }
